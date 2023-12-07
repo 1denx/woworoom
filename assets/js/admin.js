@@ -1,39 +1,15 @@
-let menuOpenBtn = document.querySelector('.menuToggle');
-let linkBtn = document.querySelectorAll('.topBar-menu a');
-let menu = document.querySelector('.topBar-menu');
-menuOpenBtn.addEventListener('click', menuToggle);
+const baseUrl = 'https://livejs-api.hexschool.io/api/livejs/v1/admin/';
+const apiPath = 'eden';
+const apiUrl = `${baseUrl}${apiPath}`;
 
-linkBtn.forEach((item) => {
-    item.addEventListener('click', closeMenu);
-})
-
-function menuToggle() {
-    if (menu.classList.contains('openMenu')) {
-        menu.classList.remove('openMenu');
-    } else {
-        menu.classList.add('openMenu');
-    }
+// 取得訂單
+let ordersData = [];
+function getOrderData() {
+    axios.get(`${apiUrl}/orders`)
+        .then((res) => {
+            ordersData = res.data;
+            console.log(ordersData)
+        })
 }
-function closeMenu() {
-    menu.classList.remove('openMenu');
-}
-
-// C3.js
-let chart = c3.generate({
-    bindto: '#chart', // HTML 元素綁定
-    data: {
-        type: "pie",
-        columns: [
-            ['Louvre 雙人床架', 1],
-            ['Antony 雙人床架', 2],
-            ['Anty 雙人床架', 3],
-            ['其他', 4],
-        ],
-        colors: {
-            "Louvre 雙人床架": "#DACBFF",
-            "Antony 雙人床架": "#9D7FEA",
-            "Anty 雙人床架": "#5434A7",
-            "其他": "#301E5F",
-        }
-    },
-});
+getOrderData()
+// 渲染訂單
