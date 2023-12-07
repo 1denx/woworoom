@@ -1,3 +1,4 @@
+import { baseUrl, apiPath, apiUrl } from './config';
 // 初始化
 function init() {
     getProductData();
@@ -31,8 +32,8 @@ function renderProductList(productData) {
         />
         <a href="#" class="addCardBtn" data-id="${item.id}">加入購物車</a>
         <h3>${item.title}</h3>
-        <del class="originPrice">NT$${item.origin_price}</del>
-        <p class="nowPrice">NT$${item.price}</p>
+        <del class="originPrice">NT$${toThousands(item.origin_price)}</del>
+        <p class="nowPrice">NT$${toThousands(item.price)}</p>
       </li>`
     })
     productWrap.innerHTML = str;
@@ -78,7 +79,7 @@ let cartsData = [];
 function getCartsData() {
     axios.get(`${apiUrl}/carts`)
         .then((res) => {
-            document.querySelector('.js-total').textContent = res.data.finalTotal;
+            document.querySelector('.js-total').textContent = toThousands(res.data.finalTotal);
             cartsData = res.data.carts;
             renderCartsData(cartsData);
         })
@@ -99,9 +100,9 @@ function renderCartsData(cartsData) {
                             <p>${item.product.title}</p>
                         </div>
                     </td>
-                    <td>${item.product.price}</td>
-                    <td>${item.quantity}</td>
-                    <td>${item.product.price * item.quantity}</td>
+                    <td>${toThousands(item.product.price)}</td>
+                    <td>${toThousands(item.quantity)}</td>
+                    <td>${toThousands(item.product.price * item.quantity)}</td>
                     <td class="discardBtn">
                         <a href="#" class="material-icons" data-id="${item.id}">clear</a>
                     </td>
@@ -297,3 +298,10 @@ function validateForm() {
     })
 }
 validateForm();
+
+// util js
+function toThousands(x) {
+    let parts = x.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
+}
