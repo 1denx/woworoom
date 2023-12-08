@@ -66,7 +66,7 @@ function renderOrderData(ordersData) {
       </tr>`
     })
     orderList.innerHTML = str;
-    renderC3();
+    sortOrderData();
 }
 orderList.addEventListener('click', (e) => {
     e.preventDefault();
@@ -131,34 +131,61 @@ function deleOrderItem(id) {
             console.log(err)
         })
 }
-// C3.js
-function renderC3() {
-    // 物件資料收集
+// render C3 LV2
+function sortOrderData() {
     let total = {};
+
     ordersData.forEach((item) => {
         item.products.forEach((productItem) => {
-            if (total[productItem.category] == undefined) {
-                total[productItem.category] = productItem.price * productItem.quantity;
+            if (total[productItem.title] == undefined) {
+                total[productItem.title] = productItem.price * productItem.quantity;
             } else {
-                total[productItem.category] += productItem.price * productItem.quantity;
+                total[productItem.title] += productItem.price * productItem.quantity;
             }
-        })
-    })
-    // 做出資料關聯
-    let categoryAry = Object.keys(total);
-    let newData = []
-    categoryAry.forEach((item) => {
+        });
+    });
+
+    // 資料格式調整
+    let columnsData = [];
+    let productItems = Object.keys(total);
+    productItems.forEach((productItem) => {
         let ary = [];
-        ary.push(item);
-        ary.push(total[item]);
-        newData.push(ary);
-    })
+        ary.push(productItem);
+        ary.push(total[productItem]);
+        columnsData.push(ary);
+    });
+
+    // 排序大到小
+    columnsData.sort((a, b) => b[1] - a[1]);
+
+    let newData = [];
+    let others = ["其他", 0];
+    columnsData.forEach((item, index) => {
+        if (index < 3) {
+            newData.push(item);
+        } else {
+            others[1] += item[1];
+        }
+    });
+    newData.push(others);
+
+    renderC3(newData);
+}
+
+// C3.js
+function renderC3(data) {
+    let colorList = ["#301E5F", "#5434A7", "#9D7FEA", "#DACBFF"];
+    let colorSetting = {};
+    data.forEach((item, index) => {
+        colorSetting[item[0]] = colorList[index];
+    });
 
     let chart = c3.generate({
-        bindto: "#chart", // HTML 元素綁定
+        bindto: "#chart",
         data: {
             type: "pie",
-            columns: newData,
+            columns: data,
+            colors: colorSetting,
         },
     });
 }
